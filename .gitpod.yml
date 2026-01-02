@@ -1,0 +1,83 @@
+image: node:18
+
+tasks:
+  - name: Install Dependencies
+    init: |
+      echo "📦 安装依赖..."
+      npm install
+      cd backend && npm install
+      cd ../frontend && npm install
+      echo "✅ 依赖安装完成"
+  
+  - name: Backend Server
+    command: |
+      echo "🚀 启动后端服务..."
+      cd backend && npm start
+    openMode: ignore
+  
+  - name: Frontend Server
+    command: |
+      echo "🎨 启动前端服务..."
+      sleep 3
+      cd frontend && npm run serve
+    openMode: split-right
+
+ports:
+  - port: 3001
+    onOpen: ignore
+    visibility: public
+  - port: 3004
+    onOpen: open-browser
+    visibility: public
+
+github:
+  prebuilds:
+    master: true
+    branches: true
+    pullRequests: true
+    addCheck: true
+
+
+
+
+
+tasks:
+  - name: Install Dependencies
+    init: |
+      echo "📦 安装依赖..."
+      npm install
+      cd backend && npm install
+      cd ../frontend && npm install
+      echo "✅ 依赖安装完成"
+  
+  - name: Backend Server
+    command: |
+      echo "🚀 启动后端服务..."
+      cd backend && npm start
+    openMode: ignore
+  
+  - name: Frontend Server
+    command: |
+      echo "🎨 启动前端服务..."
+      sleep 3
+      cd frontend && npm run serve
+    openMode: split-right
+
+ports:
+  - port: 3001
+    onOpen: ignore
+    visibility: public
+  - port: 3004
+    onOpen: open-browser
+    visibility: public
+
+github:
+  prebuilds:
+    master: true
+    branches: true
+    pullRequests: true
+    addCheck: true
+
+
+
+
