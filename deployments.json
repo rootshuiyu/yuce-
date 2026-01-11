@@ -1,0 +1,23 @@
+{
+  "network": "Sepolia Testnet",
+  "chainId": 11155111,
+  "deployer": "0x09324B664fA0fE6497153Fd10ebfc4eFae26B6cE",
+  "deploymentTime": "2026-01-11T10:06:51.052Z",
+  "contracts": {
+    "MockUSDT": {
+      "address": "0xAc1c28c7EDA84Cf73af7f6De8027C7Fda70717C9",
+      "name": "MockUSDT",
+      "description": "测试 USDT 代币"
+    },
+    "MarketFactory": {
+      "address": "0x1De2EC65a84cDF6422Bf02c460347C15c53237DE",
+      "name": "MarketFactory",
+      "description": "市场工厂合约"
+    },
+    "Settlement": {
+      "address": "0xDa8854F945Df80177e881F3D3629fcC160b1D830",
+      "name": "Settlement",
+      "description": "结算合约"
+    }
+  }
+}

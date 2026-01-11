@@ -10,6 +10,8 @@
   --color-purple-primary: #a78bfa;
   --color-purple-light: #c4b5fd;
   --color-purple-dark: #7c3aed;
+  --color-yes: #10b981;
+  --color-no: #ef4444;
 }
 
 * {
@@ -33,45 +35,382 @@ html, body {
   background-color: var(--color-dark-bg);
 }
 
-.card-dark {
-  background-color: var(--color-dark-card);
-  border: 1px solid var(--color-dark-border);
-  border-radius: 0.5rem;
+/* 导航栏样式 */
+.navbar {
+  background-color: var(--color-dark-surface);
+  border-bottom: 1px solid var(--color-dark-border);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.btn-primary {
+.navbar-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.navbar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  gap: 1rem;
+  border-bottom: 1px solid var(--color-dark-border);
+}
+
+.navbar-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-purple-light);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.navbar-search {
+  flex: 1;
+  max-width: 400px;
+}
+
+.navbar-search input {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background-color: var(--color-dark-card);
+  border: 1px solid var(--color-dark-border);
+  border-radius: 0.375rem;
+  color: #e5e7eb;
+  font-size: 0.875rem;
+}
+
+.navbar-search input::placeholder {
+  color: #9ca3af;
+}
+
+.navbar-search input:focus {
+  outline: none;
+  border-color: var(--color-purple-primary);
+  background-color: var(--color-dark-bg);
+}
+
+.navbar-wallet {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navbar-wallet button {
+  padding: 0.5rem 1rem;
   background-color: var(--color-purple-primary);
   color: var(--color-dark-bg);
   border: none;
   border-radius: 0.375rem;
-  padding: 0.5rem 1rem;
-  font-weight: 600;
   cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
   transition: all 0.3s ease;
 }
 
-.btn-primary:hover {
+.navbar-wallet button:hover {
   background-color: var(--color-purple-light);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(167, 139, 250, 0.3);
 }
 
-.btn-secondary {
-  background-color: var(--color-dark-surface);
-  color: var(--color-purple-light);
+/* 分类导航 */
+.category-nav {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: none;
+}
+
+.category-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.category-btn {
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  color: #9ca3af;
   border: 1px solid var(--color-dark-border);
   border-radius: 0.375rem;
-  padding: 0.5rem 1rem;
-  font-weight: 600;
   cursor: pointer;
+  font-size: 0.875rem;
+  white-space: nowrap;
   transition: all 0.3s ease;
 }
 
-.btn-secondary:hover {
+.category-btn:hover {
   background-color: var(--color-dark-card);
+  color: var(--color-purple-light);
+}
+
+.category-btn.active {
+  background-color: var(--color-purple-primary);
+  color: var(--color-dark-bg);
   border-color: var(--color-purple-primary);
 }
 
+/* 主容器 */
+.main-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* 过滤器 */
+.filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-group label {
+  font-size: 0.875rem;
+  color: #9ca3af;
+}
+
+.filter-group select {
+  padding: 0.5rem;
+  background-color: var(--color-dark-card);
+  border: 1px solid var(--color-dark-border);
+  border-radius: 0.375rem;
+  color: #e5e7eb;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.filter-group select:focus {
+  outline: none;
+  border-color: var(--color-purple-primary);
+}
+
+/* 市场网格 - Polymarket 风格的紧凑布局 */
+.markets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  width: 100%;
+}
+
+/* 市场卡片 */
+.market-card {
+  background-color: var(--color-dark-card);
+  border: 1px solid var(--color-dark-border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
+}
+
+.market-card:hover {
+  border-color: var(--color-purple-primary);
+  background-color: #3d2f52;
+  box-shadow: 0 4px 12px rgba(167, 139, 250, 0.2);
+}
+
+.market-card-header {
+  margin-bottom: 1rem;
+}
+
+.market-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-purple-light);
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.market-card-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+/* 概率显示 */
+.probability-section {
+  margin-bottom: 1rem;
+  flex-grow: 1;
+}
+
+.probability-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.probability-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.probability-label.yes {
+  color: var(--color-yes);
+}
+
+.probability-label.no {
+  color: var(--color-no);
+}
+
+.probability-value {
+  font-size: 0.875rem;
+  font-weight: 700;
+  min-width: 40px;
+  text-align: right;
+  color: #e5e7eb;
+}
+
+/* 交易按钮 */
+.trade-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.btn-yes, .btn-no {
+  padding: 0.75rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-yes {
+  background-color: var(--color-yes);
+  color: white;
+}
+
+.btn-yes:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+}
+
+.btn-no {
+  background-color: var(--color-no);
+  color: white;
+}
+
+.btn-no:hover {
+  background-color: #dc2626;
+  transform: translateY(-2px);
+}
+
+/* 交易量 */
+.market-volume {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-dark-border);
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #9ca3af;
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.empty-state-text {
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+}
+
+/* 加载状态 */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+}
+
+.spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid var(--color-dark-border);
+  border-top-color: var(--color-purple-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .markets-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+
+  .navbar-top {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .navbar-search {
+    max-width: 100%;
+  }
+
+  .navbar-wallet {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+
+  .filter-group {
+    width: 100%;
+  }
+
+  .filter-group select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .markets-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .market-card {
+    padding: 0.75rem;
+    min-height: auto;
+  }
+
+  .market-card-title {
+    font-size: 0.875rem;
+  }
+}
+
+/* 滚动条样式 */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -82,7 +421,7 @@ html, body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-purple-dark);
+  background: var(--color-dark-border);
   border-radius: 4px;
 }
 

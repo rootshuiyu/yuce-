@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { ethers } from 'ethers'
 
 export const useWalletStore = defineStore('wallet', () => {
+  // 状态
   const account = ref(null)
   const isConnected = ref(false)
   const balance = ref('0')
@@ -9,14 +11,18 @@ export const useWalletStore = defineStore('wallet', () => {
   const chainName = ref('')
   const error = ref(null)
   const isLoading = ref(false)
+  const provider = ref(null)
+  const signer = ref(null)
 
   // 支持的网络配置
   const NETWORKS = {
-    1: { name: 'Ethereum Mainnet', symbol: 'ETH' },
-    5: { name: 'Goerli Testnet', symbol: 'ETH' },
-    56: { name: 'BSC Mainnet', symbol: 'BNB' },
-    97: { name: 'BSC Testnet', symbol: 'BNB' },
-    137: { name: 'Polygon', symbol: 'MATIC' }
+    1: { name: 'Ethereum Mainnet', symbol: 'ETH', rpc: 'https://eth.publicnode.com' },
+    5: { name: 'Goerli Testnet', symbol: 'ETH', rpc: 'https://goerli.publicnode.com' },
+    11155111: { name: 'Sepolia Testnet', symbol: 'ETH', rpc: 'https://sepolia.publicnode.com' },
+    56: { name: 'BSC Mainnet', symbol: 'BNB', rpc: 'https://bsc-dataseed1.binance.org:8545' },
+    97: { name: 'BSC Testnet', symbol: 'BNB', rpc: 'https://data-seed-prebsc-1-b.binance.org:8545' },
+    137: { name: 'Polygon', symbol: 'MATIC', rpc: 'https://polygon-rpc.com' },
+    80001: { name: 'Polygon Mumbai', symbol: 'MATIC', rpc: 'https://rpc-mumbai.maticvigil.com' }
   }
 
   const getNetworkName = (id) => {
@@ -42,6 +48,9 @@ export const useWalletStore = defineStore('wallet', () => {
         account.value = accounts[0]
         isConnected.value = true
         
+        // 初始化 provider 和 signer
+        await initializeProvider()
+        
         // 获取链信息
         const chainIdHex = await window.ethereum.request({
           method: 'eth_chainId'
@@ -65,6 +74,15 @@ export const useWalletStore = defineStore('wallet', () => {
     }
   }
 
+  const initializeProvider = async () => {
+    try {
+      provider.value = new ethers.BrowserProvider(window.ethereum)
+      signer.value = await provider.value.getSigner()
+    } catch (err) {
+      console.error('Failed to initialize provider:', err)
+    }
+  }
+
   const connectWallet = async () => {
     try {
       isLoading.value = true
@@ -82,6 +100,9 @@ export const useWalletStore = defineStore('wallet', () => {
       if (accounts.length > 0) {
         account.value = accounts[0]
         isConnected.value = true
+
+        // 初始化 provider 和 signer
+        await initializeProvider()
 
         // 获取链 ID
         const chainIdHex = await window.ethereum.request({
@@ -119,18 +140,17 @@ export const useWalletStore = defineStore('wallet', () => {
     chainId.value = null
     chainName.value = ''
     error.value = null
+    provider.value = null
+    signer.value = null
     removeEventListeners()
   }
 
   const updateBalance = async () => {
     try {
-      if (!account.value) return
+      if (!account.value || !provider.value) return
 
-      const balanceWei = await window.ethereum.request({
-        method: 'eth_getBalance',
-        params: [account.value, 'latest']
-      })
-      balance.value = (parseInt(balanceWei, 16) / 1e18).toFixed(4)
+      const balanceWei = await provider.value.getBalance(account.value)
+      balance.value = ethers.formatEther(balanceWei)
     } catch (err) {
       console.error('Failed to update balance:', err)
     }
@@ -150,6 +170,7 @@ export const useWalletStore = defineStore('wallet', () => {
         })
         chainId.value = targetChainId
         chainName.value = getNetworkName(targetChainId)
+        await initializeProvider()
         return true
       } catch (switchError) {
         // 如果网络不存在，尝试添加网络
@@ -167,7 +188,7 @@ export const useWalletStore = defineStore('wallet', () => {
     }
   }
 
-  const addNetwork = async (chainId) => {
+  const addNetwork = async (targetChainId) => {
     try {
       const networkConfig = {
         56: {
@@ -183,10 +204,24 @@ export const useWalletStore = defineStore('wallet', () => {
           nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
           rpcUrls: ['https://data-seed-prebsc-1-b.binance.org:8545'],
           blockExplorerUrls: ['https://testnet.bscscan.com']
+        },
+        137: {
+          chainId: '0x89',
+          chainName: 'Polygon',
+          nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 },
+          rpcUrls: ['https://polygon-rpc.com'],
+          blockExplorerUrls: ['https://polygonscan.com']
+        },
+        80001: {
+          chainId: '0x13881',
+          chainName: 'Polygon Mumbai',
+          nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 },
+          rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
+          blockExplorerUrls: ['https://mumbai.polygonscan.com']
         }
       }
 
-      const config = networkConfig[chainId]
+      const config = networkConfig[targetChainId]
       if (!config) {
         throw new Error('不支持的网络')
       }
@@ -196,8 +231,9 @@ export const useWalletStore = defineStore('wallet', () => {
         params: [config]
       })
 
-      chainId.value = chainId
-      chainName.value = getNetworkName(chainId)
+      chainId.value = targetChainId
+      chainName.value = getNetworkName(targetChainId)
+      await initializeProvider()
       return true
     } catch (err) {
       error.value = `添加网络失败: ${err.message}`
@@ -249,15 +285,11 @@ export const useWalletStore = defineStore('wallet', () => {
 
   const signMessage = async (message) => {
     try {
-      if (!account.value) {
+      if (!signer.value) {
         throw new Error('钱包未连接')
       }
 
-      const signature = await window.ethereum.request({
-        method: 'personal_sign',
-        params: [message, account.value]
-      })
-
+      const signature = await signer.value.signMessage(message)
       return signature
     } catch (err) {
       error.value = `签名失败: ${err.message}`
@@ -268,26 +300,20 @@ export const useWalletStore = defineStore('wallet', () => {
 
   const sendTransaction = async (to, value, data = '0x') => {
     try {
-      if (!account.value) {
+      if (!signer.value) {
         throw new Error('钱包未连接')
       }
 
       isLoading.value = true
       error.value = null
 
-      const txHash = await window.ethereum.request({
-        method: 'eth_sendTransaction',
-        params: [
-          {
-            from: account.value,
-            to,
-            value: value ? '0x' + parseInt(value).toString(16) : '0x0',
-            data
-          }
-        ]
+      const tx = await signer.value.sendTransaction({
+        to,
+        value: value ? ethers.parseEther(value.toString()) : 0n,
+        data
       })
 
-      return txHash
+      return tx.hash
     } catch (err) {
       error.value = `交易失败: ${err.message}`
       console.error('Failed to send transaction:', err)
@@ -306,6 +332,14 @@ export const useWalletStore = defineStore('wallet', () => {
     return typeof window.ethereum !== 'undefined'
   })
 
+  const formattedBalance = computed(() => {
+    try {
+      return parseFloat(balance.value).toFixed(4)
+    } catch {
+      return '0'
+    }
+  })
+
   return {
     // State
     account,
@@ -315,10 +349,13 @@ export const useWalletStore = defineStore('wallet', () => {
     chainName,
     error,
     isLoading,
+    provider,
+    signer,
     
     // Computed
     shortAddress,
     isMetaMaskInstalled,
+    formattedBalance,
     
     // Methods
     checkIfWalletIsConnected,
@@ -330,6 +367,7 @@ export const useWalletStore = defineStore('wallet', () => {
     signMessage,
     sendTransaction,
     getNetworkName,
-    getNetworkSymbol
+    getNetworkSymbol,
+    initializeProvider
   }
 })
