@@ -1,10 +1,10 @@
 <template>
-  <div class="pt-20 pb-12 min-h-screen bg-[#0f0a1a]">
-    <div class="max-w-4xl mx-auto px-4">
+  <div class="market-detail-page">
+    <div class="market-detail-container">
       <!-- Back Button -->
-      <router-link to="/" class="inline-flex items-center gap-2 text-[#a78bfa] hover:text-[#c4b5fd] mb-8 transition-colors">
-        ← 返回市场列表
-      </router-link>
+      <div class="breadcrumb">
+        <button @click="$router.back()" class="back-btn">← 返回</button>
+      </div>
 
       <!-- Loading State -->
       <div v-if="marketStore.loading" class="card-dark p-8 text-center">
@@ -133,6 +133,9 @@ import { useRoute } from 'vue-router'
 import { useMarketStore } from '../stores/market'
 import { useWalletStore } from '../stores/wallet'
 import TradeModal from '../components/TradeModal.vue'
+import TradeForm from '../components/TradeForm.vue'
+import OrderBook from '../components/OrderBook.vue'
+import PortfolioAndHistory from '../components/PortfolioAndHistory.vue'
 
 const route = useRoute()
 const marketStore = useMarketStore()
