@@ -297,7 +297,7 @@
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
 // 登录状态
 const isLoggedIn = ref(false)

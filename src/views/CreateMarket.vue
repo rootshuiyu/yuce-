@@ -276,7 +276,7 @@ const selectedCategoryName = computed(() => {
 // 加载分类数据
 const loadCategories = async () => {
   try {
-    const response = await fetch('http://localhost:3000/api/categories')
+    const response = await fetch('/api/categories')
     const data = await response.json()
     if (data.success) {
       categories.value = data.data
@@ -293,7 +293,7 @@ const handleCategoryChange = async () => {
   
   if (form.value.primaryCategory) {
     try {
-      const response = await fetch(`http://localhost:3000/api/categories/${form.value.primaryCategory}/subcategories`)
+      const response = await fetch(`/api/categories/${form.value.primaryCategory}/subcategories`)
       const data = await response.json()
       if (data.success) {
         subcategories.value = data.data
@@ -317,7 +317,7 @@ const handleSubmit = async () => {
   isSubmitting.value = true
   
   try {
-    const response = await fetch('http://localhost:3000/api/markets', {
+    const response = await fetch('/api/markets', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

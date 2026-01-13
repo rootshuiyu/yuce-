@@ -308,7 +308,7 @@ const fetchUserMarkets = async () => {
       return
     }
 
-    const response = await fetch(`http://localhost:3000/api/markets/user/${walletStore.address}`)
+    const response = await fetch(`/api/markets/user/${walletStore.address}`)
     const data = await response.json()
 
     if (data.success) {

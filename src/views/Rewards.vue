@@ -171,7 +171,7 @@ export default {
           return
         }
 
-        const response = await fetch('http://localhost:3000/api/settlement/rewards', {
+        const response = await fetch('/api/settlement/rewards', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -198,7 +198,7 @@ export default {
           return
         }
 
-        const response = await fetch(`http://localhost:3000/api/settlement/claim/${rewardId}`, {
+        const response = await fetch(`/api/settlement/claim/${rewardId}`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -232,7 +232,7 @@ export default {
         }
 
         const rewardIds = pendingRewards.value.map(r => r.id)
-        const response = await fetch('http://localhost:3000/api/settlement/claim-batch', {
+        const response = await fetch('/api/settlement/claim-batch', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,

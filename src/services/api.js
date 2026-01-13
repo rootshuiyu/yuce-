@@ -1,7 +1,7 @@
 // API 服务层 - 生产级别
 import { ref } from 'vue'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
 const CACHE_TTL = import.meta.env.VITE_CACHE_TTL || 3600
 const CACHE_ENABLED = import.meta.env.VITE_CACHE_ENABLED !== 'false'
 

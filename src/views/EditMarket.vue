@@ -302,7 +302,7 @@ const handleCategoryChange = async () => {
   if (form.value.primaryCategory) {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/categories/${form.value.primaryCategory}/subcategories`
+        `/api/categories/${form.value.primaryCategory}/subcategories`
       )
       const data = await response.json()
       if (data.success) {
@@ -374,7 +374,7 @@ const handleSubmit = async () => {
   successMessage.value = ''
 
   try {
-    const response = await fetch(`http://localhost:3000/api/markets/${marketId}`, {
+    const response = await fetch(`/api/markets/${marketId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -412,7 +412,7 @@ const handleSubmit = async () => {
 // 加载市场数据
 const fetchMarket = async () => {
   try {
-    const response = await fetch(`http://localhost:3000/api/markets/${marketId}`)
+    const response = await fetch(`/api/markets/${marketId}`)
     const data = await response.json()
 
     if (data.success) {
@@ -446,7 +446,7 @@ const fetchMarket = async () => {
 // 加载分类
 const fetchCategories = async () => {
   try {
-    const response = await fetch('http://localhost:3000/api/categories')
+    const response = await fetch('/api/categories')
     const data = await response.json()
     if (data.success) {
       categories.value = data.data

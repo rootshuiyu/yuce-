@@ -107,8 +107,8 @@
           </div>
         </div>
 
-        <!-- 市场列表 -->
-        <Home
+        <!-- 路由视图 -->
+        <router-view
           :selectedPrimaryCategory="selectedPrimaryCategory"
           :selectedSubcategory="selectedSubcategory"
           :sortBy="sortBy"
@@ -134,7 +134,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWalletStore } from './stores/wallet'
 import { getCategoryIcon, getCategoryGradient } from './utils/categoryIcons'
-import Home from './views/Home.vue'
+// import Home from './views/Home.vue' // 使用 router-view 替代
 import CreateMarketModal from './components/CreateMarketModal.vue'
 import ModernCategoryNav from './components/ModernCategoryNav.vue'
 import './styles/sidebar.css'
