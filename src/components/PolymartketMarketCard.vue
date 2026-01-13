@@ -1,53 +1,59 @@
 <template>
-  <div class="polymarket-card" @click="emit('click')">
-    <!-- 市场图片 -->
-    <div class="card-image">
-      <img :src="market.imageUrl || defaultImage" :alt="market.question" />
-      <div class="card-overlay"></div>
+  <div class="market-card" @click="emit('click')">
+    <!-- 分类标签 -->
+    <div class="card-header">
+      <span class="category-badge">{{ market.subcategory }}</span>
+      <span class="end-date">{{ formatDate(market.endDate) }}</span>
     </div>
 
-    <!-- 卡片内容 -->
-    <div class="card-content">
-      <!-- 标题 -->
-      <h3 class="market-title">{{ market.question }}</h3>
+    <!-- 市场问题 -->
+    <h3 class="market-question">{{ market.question }}</h3>
 
-      <!-- 主要概率显示 -->
-      <div class="main-probability">
-        <div class="probability-box yes">
+    <!-- 概率显示区域 -->
+    <div class="probability-section">
+      <!-- YES 概率 -->
+      <div class="probability-item yes">
+        <div class="prob-header">
           <span class="prob-label">YES</span>
-          <span class="prob-value">{{ yesProb }}%</span>
+          <span class="prob-percentage">{{ yesProb }}%</span>
         </div>
-        <div class="probability-box no">
+        <div class="prob-bar">
+          <div class="prob-fill yes-fill" :style="{ width: yesProb + '%' }"></div>
+        </div>
+      </div>
+
+      <!-- NO 概率 -->
+      <div class="probability-item no">
+        <div class="prob-header">
           <span class="prob-label">NO</span>
-          <span class="prob-value">{{ noProb }}%</span>
+          <span class="prob-percentage">{{ noProb }}%</span>
+        </div>
+        <div class="prob-bar">
+          <div class="prob-fill no-fill" :style="{ width: noProb + '%' }"></div>
         </div>
       </div>
+    </div>
 
-      <!-- 交易量 -->
-      <div class="volume-info">
-        <span class="volume-label">Volume</span>
-        <span class="volume-value">${{ formatVolume(market.totalVolume) }}</span>
+    <!-- 交易信息 -->
+    <div class="trading-info">
+      <div class="info-item">
+        <span class="info-label">Volume</span>
+        <span class="info-value">${{ formatVolume(market.totalVolume) }}</span>
       </div>
+      <div class="info-item">
+        <span class="info-label">Traders</span>
+        <span class="info-value">{{ market.traders || 0 }}</span>
+      </div>
+    </div>
 
-      <!-- 底部信息 -->
-      <div class="card-footer">
-        <div class="footer-left">
-          <span class="category-badge">{{ market.subcategory }}</span>
-        </div>
-        <div class="footer-right">
-          <span class="end-date">{{ formatDate(market.endDate) }}</span>
-        </div>
-      </div>
-
-      <!-- 交易按钮 -->
-      <div class="card-actions">
-        <button class="btn-trade yes" @click.stop="emit('trade', 'yes')">
-          Buy YES
-        </button>
-        <button class="btn-trade no" @click.stop="emit('trade', 'no')">
-          Buy NO
-        </button>
-      </div>
+    <!-- 交易按钮 -->
+    <div class="card-actions">
+      <button class="btn-trade yes" @click.stop="emit('trade', 'yes')">
+        BUY YES
+      </button>
+      <button class="btn-trade no" @click.stop="emit('trade', 'no')">
+        BUY NO
+      </button>
     </div>
   </div>
 </template>
@@ -64,14 +70,12 @@ const props = defineProps({
 
 const emit = defineEmits(['click', 'trade'])
 
-const defaultImage = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250"%3E%3Crect fill="%23374151" width="400" height="250"/%3E%3Ctext x="50%25" y="50%25" font-size="24" fill="%239CA3AF" text-anchor="middle" dominant-baseline="middle"%3EMarket%3C/text%3E%3C/svg%3E'
-
 const yesProb = computed(() => {
-  return Math.round((props.market.impliedProbability?.yes || 0.5) * 100)
+  return Math.round((props.market.impliedProbability?.yes || props.market.currentYesProb || 0.5) * 100)
 })
 
 const noProb = computed(() => {
-  return Math.round((props.market.impliedProbability?.no || 0.5) * 100)
+  return Math.round((props.market.impliedProbability?.no || props.market.currentNoProb || 0.5) * 100)
 })
 
 const formatVolume = (volume) => {
@@ -85,243 +89,243 @@ const formatVolume = (volume) => {
 }
 
 const formatDate = (date) => {
-  if (!date) return 'TBD'
+  if (!date) return ''
   const d = new Date(date)
-  const now = new Date()
-  const diff = d - now
-  const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
-  
-  if (days < 0) return 'Expired'
-  if (days === 0) return 'Today'
-  if (days === 1) return 'Tomorrow'
-  if (days < 7) return `${days}d`
-  
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${month}/${day}`
 }
 </script>
 
 <style scoped>
-.polymarket-card {
-  background: var(--color-dark-card);
-  border: 1px solid var(--color-dark-border);
-  border-radius: 0.75rem;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 420px;
-}
-
-.polymarket-card:hover {
-  border-color: var(--color-purple-primary);
-  box-shadow: 0 12px 24px rgba(168, 85, 247, 0.2);
-  transform: translateY(-6px);
-}
-
-/* 市场图片 */
-.card-image {
-  position: relative;
-  width: 100%;
-  height: 180px;
-  overflow: hidden;
-  background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
-}
-
-.card-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.polymarket-card:hover .card-image img {
-  transform: scale(1.05);
-}
-
-.card-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
-}
-
-/* 卡片内容 */
-.card-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.market-card {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 1px solid #333;
+  border-radius: 12px;
   padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 320px;
 }
 
-/* 标题 */
-.market-title {
-  font-size: 1.125rem;
+.market-card:hover {
+  border-color: #9d4edd;
+  box-shadow: 0 8px 24px rgba(157, 78, 221, 0.15);
+  transform: translateY(-4px);
+}
+
+/* 卡片头部 */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 0.5rem;
+}
+
+.category-badge {
+  background: rgba(157, 78, 221, 0.2);
+  color: #9d4edd;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: #e5e7eb;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.end-date {
+  font-size: 0.8rem;
+  color: #999;
+  white-space: nowrap;
+}
+
+/* 市场问题 */
+.market-question {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
   line-height: 1.4;
-  margin: 0;
+  margin-bottom: 1.25rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  min-height: 2.8em;
 }
 
-/* 主要概率显示 */
-.main-probability {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-}
-
-.probability-box {
+/* 概率显示区域 */
+.probability-section {
+  margin-bottom: 1.25rem;
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
+  gap: 1rem;
+}
+
+.probability-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.prob-header {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  padding: 0.875rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.probability-box.yes {
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.3);
-  color: #86efac;
-}
-
-.probability-box.no {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #fca5a5;
-}
-
-.probability-box:hover {
-  border-color: currentColor;
-  background: rgba(255, 255, 255, 0.05);
 }
 
 .prob-label {
-  font-size: 0.75rem;
-  opacity: 0.8;
+  font-size: 0.85rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.5px;
 }
 
-.prob-value {
-  font-size: 1.5rem;
-  margin-top: 0.25rem;
+.probability-item.yes .prob-label {
+  color: #06d6a0;
 }
 
-/* 交易量 */
-.volume-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.probability-item.no .prob-label {
+  color: #ff6b6b;
+}
+
+.prob-percentage {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.probability-item.yes .prob-percentage {
+  color: #06d6a0;
+}
+
+.probability-item.no .prob-percentage {
+  color: #ff6b6b;
+}
+
+.prob-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.prob-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.yes-fill {
+  background: linear-gradient(90deg, #06d6a0 0%, #00c896 100%);
+}
+
+.no-fill {
+  background: linear-gradient(90deg, #ff6b6b 0%, #ff5252 100%);
+}
+
+/* 交易信息 */
+.trading-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
   padding: 0.75rem;
-  background: rgba(168, 85, 247, 0.05);
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
 }
 
-.volume-label {
-  color: #9ca3af;
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
-.volume-value {
-  color: var(--color-purple-light);
+.info-label {
+  font-size: 0.75rem;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   font-weight: 600;
 }
 
-/* 底部信息 */
-.card-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.75rem;
-  color: #9ca3af;
-}
-
-.category-badge {
-  background: var(--color-dark-bg);
-  padding: 0.375rem 0.75rem;
-  border-radius: 0.25rem;
-  color: var(--color-purple-light);
-}
-
-.end-date {
-  background: rgba(168, 85, 247, 0.1);
-  padding: 0.375rem 0.75rem;
-  border-radius: 0.25rem;
+.info-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
 }
 
 /* 交易按钮 */
 .card-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  margin-top: auto;
+  gap: 0.75rem;
 }
 
 .btn-trade {
-  padding: 0.75rem;
+  padding: 0.75rem 1rem;
   border: none;
-  border-radius: 0.375rem;
+  border-radius: 8px;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.5px;
 }
 
 .btn-trade.yes {
-  background: rgba(34, 197, 94, 0.2);
-  color: #86efac;
-  border: 1px solid rgba(34, 197, 94, 0.4);
+  background: linear-gradient(135deg, #06d6a0 0%, #00c896 100%);
+  color: #000;
 }
 
 .btn-trade.yes:hover {
-  background: rgba(34, 197, 94, 0.3);
-  border-color: #86efac;
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(6, 214, 160, 0.3);
 }
 
 .btn-trade.no {
-  background: rgba(239, 68, 68, 0.2);
-  color: #fca5a5;
-  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+  color: #fff;
 }
 
 .btn-trade.no:hover {
-  background: rgba(239, 68, 68, 0.3);
-  border-color: #fca5a5;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.btn-trade:active {
+  transform: translateY(0);
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .polymarket-card {
-    min-height: 380px;
-  }
-
-  .card-image {
-    height: 150px;
-  }
-
-  .card-content {
+  .market-card {
     padding: 1rem;
-    gap: 0.875rem;
+    min-height: 300px;
   }
 
-  .market-title {
-    font-size: 1rem;
+  .market-question {
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
   }
 
-  .prob-value {
-    font-size: 1.25rem;
+  .probability-section {
+    margin-bottom: 1rem;
+  }
+
+  .trading-info {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+  }
+
+  .btn-trade {
+    padding: 0.65rem 0.8rem;
+    font-size: 0.85rem;
   }
 }
 </style>
