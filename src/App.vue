@@ -122,6 +122,12 @@
       <main class="main-content">
         <!-- 工具栏 -->
         <div class="toolbar">
+          <!-- 创建市场按钮 -->
+          <button class="btn-create-market" @click="showCreateMarketModal = true">
+            <span class="btn-icon">+</span>
+            <span class="btn-text">创建市场</span>
+          </button>
+
           <div class="toolbar-left">
             <div class="filter-group">
               <label>排序:</label>
@@ -165,6 +171,13 @@
         />
       </main>
     </div>
+
+    <!-- 创建市场模态框 -->
+    <CreateMarketModal
+      :is-open="showCreateMarketModal"
+      @close="showCreateMarketModal = false"
+      @success="handleMarketCreated"
+    />
   </div>
 </template>
 
@@ -173,6 +186,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWalletStore } from './stores/wallet'
 import Home from './views/Home.vue'
+import CreateMarketModal from './components/CreateMarketModal.vue'
 
 const router = useRouter()
 const walletStore = useWalletStore()
@@ -204,6 +218,7 @@ const subcategories = ref([])
 const sortBy = ref('volume')
 const statusFilter = ref('all')
 const viewMode = ref('grid')
+const showCreateMarketModal = ref(false)
 
 const selectedPrimaryCategoryName = computed(() => {
   if (selectedPrimaryCategory.value === 'all') return '全部'
@@ -255,6 +270,11 @@ const loadSubcategories = async (categoryId) => {
 
 const handleSearch = () => {
   console.log('搜索:', searchQuery.value)
+}
+
+const handleMarketCreated = () => {
+  // 市场创建成功，刷新市场列表
+  console.log('市场创建成功')
 }
 </script>
 
@@ -512,6 +532,43 @@ const handleSearch = () => {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+.btn-create-market {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background-color: var(--color-purple-primary);
+  color: var(--color-dark-bg);
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-create-market:hover {
+  background-color: var(--color-purple-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+}
+
+.btn-create-market .btn-icon {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.btn-create-market .btn-text {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .btn-create-market .btn-text {
+    display: inline;
   }
 }
 

@@ -138,6 +138,13 @@
       @close="selectedMarket = null"
       @trade="handleTrade"
     />
+
+    <!-- 创建市场模态框 -->
+    <CreateMarketModal
+      :is-open="showCreateMarketModal"
+      @close="showCreateMarketModal = false"
+      @success="handleMarketCreated"
+    />
   </div>
 </template>
 
@@ -145,10 +152,15 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMarketStore } from '../stores/market'
+import { useWalletStore } from '../stores/wallet'
 import TradeModal from '../components/TradeModal.vue'
+import CreateMarketModal from '../components/CreateMarketModal.vue'
 
 const router = useRouter()
 const marketStore = useMarketStore()
+const walletStore = useWalletStore()
+
+const showCreateMarketModal = ref(false)
 const selectedMarket = ref(null)
 const selectedSide = ref(null)
 
@@ -219,6 +231,19 @@ const openTradeModal = (market, side) => {
 const handleTrade = async (tradeData) => {
   console.log('交易:', tradeData)
   selectedMarket.value = null
+}
+
+const handleCreateMarketClick = () => {
+  if (!walletStore.isConnected) {
+    alert('请先连接钱包')
+    return
+  }
+  showCreateMarketModal.value = true
+}
+
+const handleMarketCreated = () => {
+  // 市场创建成功，刷新市场列表
+  marketStore.fetchMarkets()
 }
 
 const formatDate = (date) => {
