@@ -5,6 +5,7 @@ import UserCenter from '../views/UserCenter.vue'
 import Admin from '../views/Admin.vue'
 import CreateMarket from '../views/CreateMarket.vue'
 import EditMarket from '../views/EditMarket.vue'
+import Rewards from '../views/Rewards.vue'
 
 const routes = [
   {
@@ -36,6 +37,11 @@ const routes = [
     path: '/edit/:id',
     name: 'EditMarket',
     component: EditMarket
+  },
+  {
+    path: '/rewards',
+    name: 'Rewards',
+    component: Rewards
   }
 ]
 
