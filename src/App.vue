@@ -78,10 +78,10 @@
         <!-- 工具栏 -->
         <div class="toolbar">
           <!-- 创建市场按钮 -->
-          <button class="btn-create-market" @click="showCreateMarketModal = true">
+          <router-link to="/create" class="btn-create-market">
             <span class="btn-icon">+</span>
             <span class="btn-text">创建市场</span>
-          </button>
+          </router-link>
 
           <div class="toolbar-left">
             <div class="filter-group">

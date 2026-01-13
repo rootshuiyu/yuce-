@@ -3,6 +3,7 @@ import Home from '../views/Home.vue'
 import MarketDetail from '../views/MarketDetail.vue'
 import UserCenter from '../views/UserCenter.vue'
 import Admin from '../views/Admin.vue'
+import CreateMarket from '../views/CreateMarket.vue'
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
     path: '/admin',
     name: 'Admin',
     component: Admin
+  },
+  {
+    path: '/create',
+    name: 'CreateMarket',
+    component: CreateMarket
   }
 ]
 
