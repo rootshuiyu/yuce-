@@ -8,15 +8,6 @@
         </router-link>
 
         <div class="navbar-right">
-          <div class="search-box">
-            <span class="search-icon">🔍</span>
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="搜索市场..."
-              @keyup.enter="handleSearch"
-            />
-          </div>
 
           <div class="balance-info">
             <div class="balance-item">
@@ -278,7 +269,7 @@ const handleMarketCreated = () => {
 }
 
 .navbar-logo {
-  font-size: 1.25rem;
+  font-size: 1.8rem;
   font-weight: 700;
   color: var(--color-purple-light);
   text-decoration: none;
