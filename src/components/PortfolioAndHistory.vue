@@ -183,6 +183,7 @@
 <script>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useWalletStore } from '../stores/wallet';
+import { useWebSocketStore } from '../stores/websocket';
 
 export default {
   name: 'PortfolioAndHistory',
@@ -194,6 +195,7 @@ export default {
   },
   setup(props) {
     const walletStore = useWalletStore();
+    const wsStore = useWebSocketStore();
     const activeTab = ref('holdings');
     const holdings = ref([]);
     const trades = ref([]);
@@ -346,13 +348,41 @@ export default {
 
     onMounted(() => {
       fetchAllData();
-      // 每 5 秒刷新一次数据
-      refreshInterval = setInterval(fetchAllData, 5000);
+      
+      // 连接 WebSocket
+      if (walletStore.address) {
+        wsStore.connect(walletStore.address);
+      }
+      
+      // 监听持仓更新
+      const unsubscribeHolding = wsStore.onMessage('holding_update', (data) => {
+        holdings.value = data.data || [];
+      });
+      
+      // 监听订单更新
+      const unsubscribeOrder = wsStore.onMessage('order_update', (data) => {
+        fetchOrders();
+      });
+      
+      // 监听交易更新
+      const unsubscribeTrade = wsStore.onMessage('trade_executed', (data) => {
+        fetchTrades();
+      });
+      
+      // 清理函数
+      return () => {
+        unsubscribeHolding();
+        unsubscribeOrder();
+        unsubscribeTrade();
+      };
     });
 
     onUnmounted(() => {
       if (refreshInterval) {
         clearInterval(refreshInterval);
+      }
+      if (walletStore.address) {
+        wsStore.disconnect();
       }
     });
 

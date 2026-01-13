@@ -131,9 +131,10 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useWalletStore } from '../stores/wallet';
 import { useMarketStore } from '../stores/market';
+import { useWebSocketStore } from '../stores/websocket';
 
 export default {
   name: 'TradeForm',
@@ -151,6 +152,7 @@ export default {
   setup(props, { emit }) {
     const walletStore = useWalletStore();
     const marketStore = useMarketStore();
+    const wsStore = useWebSocketStore();
 
     const activeTab = ref('buy');
     const form = ref({

@@ -168,6 +168,8 @@
 
 <script>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useWebSocketStore } from '../stores/websocket';
+import { useWalletStore } from '../stores/wallet';
 
 export default {
   name: 'OrderBook',
@@ -182,6 +184,8 @@ export default {
     }
   },
   setup(props) {
+    const wsStore = useWebSocketStore();
+    const walletStore = useWalletStore();
     const buyOrders = ref([]);
     const sellOrders = ref([]);
     const isLoading = ref(false);
@@ -245,8 +249,34 @@ export default {
 
     onMounted(() => {
       fetchOrderBook();
-      // 每 2 秒刷新一次订单簿
-      refreshInterval = setInterval(fetchOrderBook, 2000);
+      
+      // 连接 WebSocket
+      if (walletStore.address) {
+        wsStore.connect(walletStore.address);
+        wsStore.subscribe(walletStore.address, props.marketId);
+      }
+      
+      // 监听订单簿更新
+      const unsubscribeOrderBook = wsStore.onMessage('orderbook_update', (data) => {
+        if (data.marketId === props.marketId) {
+          buyOrders.value = data.data.buyOrders || [];
+          sellOrders.value = data.data.sellOrders || [];
+        }
+      });
+      
+      // 监听交易成交
+      const unsubscribeTrade = wsStore.onMessage('trade_executed', (data) => {
+        if (data.marketId === props.marketId) {
+          // 重新获取订单簿
+          fetchOrderBook();
+        }
+      });
+      
+      // 清理函数
+      return () => {
+        unsubscribeOrderBook();
+        unsubscribeTrade();
+      };
     });
 
     onUnmounted(() => {
@@ -267,7 +297,9 @@ export default {
       buyToSellRatio,
       getBarWidth,
       formatAddress,
-      refreshOrderBook
+      refreshOrderBook,
+      wsStore,
+      walletStore
     };
   }
 };
