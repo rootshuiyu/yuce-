@@ -46,14 +46,18 @@
       </div>
     </div>
 
-    <!-- 交易按钮 -->
-    <div class="card-actions">
-      <button class="btn-trade yes" @click.stop="emit('trade', 'yes')">
-        BUY YES
-      </button>
-      <button class="btn-trade no" @click.stop="emit('trade', 'no')">
-        BUY NO
-      </button>
+    <!-- 交易按钮 - 居中和谐设计 -->
+    <div class="card-actions-container">
+      <div class="card-actions">
+        <button class="btn-trade yes" @click.stop="emit('trade', 'yes')">
+          <span class="btn-label">BUY</span>
+          <span class="btn-value">YES</span>
+        </button>
+        <button class="btn-trade no" @click.stop="emit('trade', 'no')">
+          <span class="btn-label">BUY</span>
+          <span class="btn-value">NO</span>
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -108,7 +112,7 @@ const formatDate = (date) => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  min-height: 320px;
+  min-height: 380px;
 }
 
 .market-card:hover {
@@ -233,7 +237,7 @@ const formatDate = (date) => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
   padding: 0.75rem;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
@@ -259,43 +263,72 @@ const formatDate = (date) => {
   color: #fff;
 }
 
-/* 交易按钮 */
+/* 交易按钮容器 - 居中 */
+.card-actions-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
 .card-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
+  width: 100%;
+  max-width: 280px;
 }
 
 .btn-trade {
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1.2rem;
   border: none;
   border-radius: 8px;
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-label {
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  opacity: 0.8;
+}
+
+.btn-value {
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .btn-trade.yes {
   background: linear-gradient(135deg, #06d6a0 0%, #00c896 100%);
   color: #000;
+  box-shadow: 0 4px 12px rgba(6, 214, 160, 0.2);
 }
 
 .btn-trade.yes:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(6, 214, 160, 0.3);
+  box-shadow: 0 6px 16px rgba(6, 214, 160, 0.35);
 }
 
 .btn-trade.no {
   background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
   color: #fff;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
 }
 
 .btn-trade.no:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  box-shadow: 0 6px 16px rgba(255, 107, 107, 0.35);
 }
 
 .btn-trade:active {
@@ -306,7 +339,7 @@ const formatDate = (date) => {
 @media (max-width: 768px) {
   .market-card {
     padding: 1rem;
-    min-height: 300px;
+    min-height: 360px;
   }
 
   .market-question {
@@ -319,13 +352,21 @@ const formatDate = (date) => {
   }
 
   .trading-info {
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
     padding: 0.5rem;
   }
 
   .btn-trade {
-    padding: 0.65rem 0.8rem;
+    padding: 0.75rem 1rem;
     font-size: 0.85rem;
+  }
+
+  .btn-value {
+    font-size: 0.95rem;
+  }
+
+  .card-actions {
+    max-width: 100%;
   }
 }
 </style>
