@@ -148,8 +148,8 @@
             <span class="text">您的市场正在等待管理员审核。通常需要 24-48 小时。</span>
           </div>
           <div class="market-actions">
-            <button class="btn-edit">编辑</button>
-            <button class="btn-cancel">取消申请</button>
+            <router-link :to="`/edit/${market.id}`" class="btn-edit">编辑</router-link>
+            <button class="btn-cancel" @click="cancelMarket(market.id)">取消申请</button>
           </div>
         </div>
       </div>
