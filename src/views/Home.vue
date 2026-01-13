@@ -13,22 +13,22 @@
       </div>
 
       <div class="filter-controls">
-        <select v-model="sortBy" class="filter-select">
+        <select :value="props.sortBy" @change="$emit('sort-changed', $event.target.value)" class="filter-select">
           <option value="newest">最新</option>
           <option value="volume">交易量</option>
           <option value="probability">概率</option>
         </select>
 
         <button
-          :class="['view-toggle', { active: viewMode === 'grid' }]"
-          @click="viewMode = 'grid'"
+          :class="['view-toggle', { active: props.viewMode === 'grid' }]"
+          @click="$emit('view-changed', 'grid')"
           title="网格视图"
         >
           ⊞
         </button>
         <button
-          :class="['view-toggle', { active: viewMode === 'list' }]"
-          @click="viewMode = 'list'"
+          :class="['view-toggle', { active: props.viewMode === 'list' }]"
+          @click="$emit('view-changed', 'list')"
           title="列表视图"
         >
           ≡
@@ -43,7 +43,7 @@
     </div>
 
     <!-- 网格视图 -->
-    <div v-else-if="filteredMarkets.length > 0 && viewMode === 'grid'" class="markets-container">
+    <div v-else-if="filteredMarkets.length > 0 && props.viewMode === 'grid'" class="markets-container">
       <div class="markets-grid">
         <PolymartketMarketCard
           v-for="market in filteredMarkets"
@@ -56,7 +56,7 @@
     </div>
 
     <!-- 列表视图 -->
-    <div v-else-if="filteredMarkets.length > 0 && viewMode === 'list'" class="markets-list-container">
+    <div v-else-if="filteredMarkets.length > 0 && props.viewMode === 'list'" class="markets-list-container">
       <table class="markets-table">
         <thead>
           <tr>
@@ -121,14 +121,52 @@ const router = useRouter()
 const marketStore = useMarketStore()
 const walletStore = useWalletStore()
 
-const viewMode = ref('grid')
-const sortBy = ref('newest')
+const props = defineProps({
+  selectedPrimaryCategory: {
+    type: String,
+    default: 'all'
+  },
+  selectedSubcategory: {
+    type: String,
+    default: null
+  },
+  sortBy: {
+    type: String,
+    default: 'newest'
+  },
+  statusFilter: {
+    type: String,
+    default: 'all'
+  },
+  viewMode: {
+    type: String,
+    default: 'grid'
+  }
+})
+
+const viewMode = computed(() => props.viewMode)
+const sortByLocal = computed(() => props.sortBy)
 const searchQuery = ref('')
 const selectedMarket = ref(null)
 const selectedSide = ref(null)
 
 const filteredMarkets = computed(() => {
   let result = marketStore.markets || []
+
+  // 按主分类过滤
+  if (props.selectedPrimaryCategory && props.selectedPrimaryCategory !== 'all') {
+    result = result.filter(m => m.primaryCategory === props.selectedPrimaryCategory)
+  }
+
+  // 按二级分类过滤
+  if (props.selectedSubcategory) {
+    result = result.filter(m => m.subcategory === props.selectedSubcategory || m.subcategoryId === props.selectedSubcategory)
+  }
+
+  // 按状态过滤
+  if (props.statusFilter !== 'all') {
+    result = result.filter(m => m.status === props.statusFilter)
+  }
 
   // 搜索过滤
   if (searchQuery.value) {
@@ -141,11 +179,11 @@ const filteredMarkets = computed(() => {
   }
 
   // 排序
-  if (sortBy.value === 'volume') {
+  if (sortByLocal.value === 'volume') {
     result.sort((a, b) => (b.volume || 0) - (a.volume || 0))
-  } else if (sortBy.value === 'probability') {
+  } else if (sortByLocal.value === 'probability') {
     result.sort((a, b) => (b.currentYesProb || 0) - (a.currentYesProb || 0))
-  } else if (sortBy.value === 'newest') {
+  } else if (sortByLocal.value === 'newest') {
     result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
   }
 
@@ -165,6 +203,8 @@ const handleTrade = () => {
   selectedMarket.value = null
   marketStore.fetchMarkets()
 }
+
+
 
 const formatVolume = (volume) => {
   if (!volume) return '0'

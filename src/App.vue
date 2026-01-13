@@ -123,6 +123,8 @@
           :sortBy="sortBy"
           :statusFilter="statusFilter"
           :viewMode="viewMode"
+          @sort-changed="sortBy = $event"
+          @view-changed="viewMode = $event"
         />
       </main>
     </div>
@@ -169,11 +171,11 @@ const formatAddress = (addr) => {
 }
 
 const searchQuery = ref('')
-const selectedPrimaryCategory = ref('cat_politics')
+const selectedPrimaryCategory = ref('all')
 const selectedSubcategory = ref(null)
 const primaryCategories = ref([])
 const subcategories = ref([])
-const sortBy = ref('volume')
+const sortBy = ref('newest')
 const statusFilter = ref('all')
 const viewMode = ref('grid')
 const showCreateMarketModal = ref(false)
