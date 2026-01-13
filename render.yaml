@@ -1,0 +1,11 @@
+services:
+  - type: static
+    name: yuce-frontend
+    plan: free
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://yuce-backend.onrender.com/api
+      - key: VITE_WS_URL
+        value: wss://yuce-backend.onrender.com
