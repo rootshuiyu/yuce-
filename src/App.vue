@@ -254,7 +254,12 @@ const selectPrimaryCategory = async (categoryId) => {
 }
 
 const selectSubcategory = (subcategoryId) => {
-  selectedSubcategory.value = subcategoryId
+  // 如果点击的是二级分类对象，使用其 ID；否则使用传入的值
+  if (subcategoryId && typeof subcategoryId === 'object') {
+    selectedSubcategory.value = subcategoryId.id
+  } else {
+    selectedSubcategory.value = subcategoryId
+  }
 }
 
 const loadSubcategories = async (categoryId) => {

@@ -199,7 +199,7 @@ const filteredMarkets = computed(() => {
 
   // 按二级分类过滤
   if (props.selectedSubcategory) {
-    result = result.filter(m => m.subcategory === props.selectedSubcategory)
+    result = result.filter(m => m.subcategory === props.selectedSubcategory || m.subcategoryId === props.selectedSubcategory)
   }
 
   // 按状态过滤
