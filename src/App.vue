@@ -67,56 +67,11 @@
 
     <!-- 主布局 - 左侧边栏 + 右侧内容 -->
     <div class="main-layout">
-      <!-- 左侧分类边栏 -->
-      <aside class="sidebar">
-        <div class="sidebar-content">
-          <!-- 一级分类 -->
-          <div class="categories-group">
-            <h3 class="group-title">分类</h3>
-            <button
-              class="category-item"
-              :class="{ active: selectedPrimaryCategory === 'all' }"
-              @click="selectPrimaryCategory('all')"
-            >
-              <span class="category-icon">📊</span>
-              <span class="category-label">全部</span>
-            </button>
-            <button
-              v-for="category in primaryCategories"
-              :key="category.id"
-              class="category-item"
-              :class="{ active: selectedPrimaryCategory === category.id }"
-              @click="selectPrimaryCategory(category.id)"
-            >
-              <span class="category-icon">{{ category.icon }}</span>
-              <span class="category-label">{{ category.name }}</span>
-            </button>
-          </div>
-
-          <!-- 二级分类 -->
-          <div v-if="subcategories.length > 0" class="subcategories-group">
-            <h3 class="group-title">{{ selectedPrimaryCategoryName }}</h3>
-            <button
-              class="subcategory-item"
-              :class="{ active: selectedSubcategory === null }"
-              @click="selectSubcategory(null)"
-            >
-              <span class="subcategory-dot"></span>
-              <span class="subcategory-label">全部</span>
-            </button>
-            <button
-              v-for="subcat in subcategories"
-              :key="subcat.id"
-              class="subcategory-item"
-              :class="{ active: selectedSubcategory === subcat.id }"
-              @click="selectSubcategory(subcat.id)"
-            >
-              <span class="subcategory-dot"></span>
-              <span class="subcategory-label">{{ subcat.name }}</span>
-            </button>
-          </div>
-        </div>
-      </aside>
+      <!-- 左侧分类导航 -->
+      <ModernCategoryNav
+        @category-changed="selectPrimaryCategory"
+        @subcategory-changed="selectSubcategory"
+      />
 
       <!-- 右侧主内容区 -->
       <main class="main-content">
@@ -185,8 +140,11 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWalletStore } from './stores/wallet'
+import { getCategoryIcon, getCategoryGradient } from './utils/categoryIcons'
 import Home from './views/Home.vue'
 import CreateMarketModal from './components/CreateMarketModal.vue'
+import ModernCategoryNav from './components/ModernCategoryNav.vue'
+import './styles/sidebar.css'
 
 const router = useRouter()
 const walletStore = useWalletStore()
